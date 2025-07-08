@@ -4,8 +4,8 @@ import { OutboxEntity } from '../../../../outbox.Module';
 
 @sealed
 @Service()
-export class UpdateOutboxDbService extends UpdateService<OutboxEntity>{
-  public constructor() {
-    super(OutboxEntity);
-  }
+export class UpdateOutboxDbService extends UpdateService<OutboxEntity> {
+	public constructor() {
+		super(OutboxEntity);
+	}
 }

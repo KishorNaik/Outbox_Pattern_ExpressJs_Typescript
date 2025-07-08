@@ -1,4 +1,4 @@
-import { sealed,Service } from '@kishornaik/utils';
+import { sealed, Service } from '@kishornaik/utils';
 import { AddService } from '../../../../../../shared/services/db/add';
 import { OutboxEntity } from '../../../../infrastructure/entity';
 

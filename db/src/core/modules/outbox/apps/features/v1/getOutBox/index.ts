@@ -1,5 +1,5 @@
 import {
-  BoolEnum,
+	BoolEnum,
 	Container,
 	DtoValidation,
 	Err,
@@ -29,8 +29,8 @@ export class GetOutboxDbDto {
 
 	@IsNotEmpty()
 	@IsNumber()
-  @Min(1)
-  @Max(12)
+	@Min(1)
+	@Max(12)
 	public take?: number = 12;
 }
 
@@ -45,13 +45,11 @@ export interface IGetOutboxDbService
 @sealed
 @Service()
 export class GetOutboxDbService implements IGetOutboxDbService {
+	private readonly dtoValidation: IDtoValidation<GetOutboxDbDto>;
 
-  private readonly dtoValidation: IDtoValidation<GetOutboxDbDto>;
-
-  public constructor() {
-    this.dtoValidation = Container.get(DtoValidation<GetOutboxDbDto>);
-  }
-
+	public constructor() {
+		this.dtoValidation = Container.get(DtoValidation<GetOutboxDbDto>);
+	}
 
 	public handleAsync(
 		params: IGetOutboxDbServiceParameters
@@ -67,13 +65,13 @@ export class GetOutboxDbService implements IGetOutboxDbService {
 			if (!params.request)
 				return ResultFactory.error(StatusCodes.BAD_REQUEST, 'Request is required');
 
-      // Validate Entity
+			// Validate Entity
 			const validationResult = await this.dtoValidation.handleAsync({
 				dto: params.request,
 				dtoClass: (params.request as any).constructor,
 			});
 			if (validationResult.isErr())
-        return ResultFactory.error(StatusCodes.BAD_REQUEST, validationResult.error.message);
+				return ResultFactory.error(StatusCodes.BAD_REQUEST, validationResult.error.message);
 
 			const { queryRunner, request } = params;
 			const { eventType, take } = request;
