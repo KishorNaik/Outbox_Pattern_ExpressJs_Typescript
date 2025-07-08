@@ -1,12 +1,12 @@
 import { mergeRouters } from '@/config/trpc';
-import { restApiDemoModule } from './restApiDemo/restApiDemo.Module';
-import { trpcDemoModule } from './trpcDemo/trpcDemo.Module';
+import { userModule } from './users/users.Module';
+import { notificationModule } from './notifications/notification.Module';
 
 // REST API
-const restApiModulesFederation: Function[] = [...restApiDemoModule];
+const restApiModulesFederation: Function[] = [...userModule,...notificationModule];
 
 // TRPC
-const trpcModulesFederation = mergeRouters(trpcDemoModule);
+const trpcModulesFederation = mergeRouters();
 type TRPCAppRouter = typeof trpcModulesFederation;
 
 export { restApiModulesFederation, trpcModulesFederation, TRPCAppRouter };

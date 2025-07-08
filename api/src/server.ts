@@ -1,5 +1,6 @@
 import { App } from '@/app';
-import { ValidateEnv, runNodeCluster } from '@kishornaik/utils';
+import { ValidateEnv, runNodeCluster, } from '@kishornaik/utils';
+import { initializeDatabase } from '@kishornaik/db';
 import { trpcModulesFederation, restApiModulesFederation } from './modules/app.Module';
 import { bullMqRunner } from './shared/utils/helpers/bullMq';
 import { rabbitMQRunner } from './shared/utils/helpers/rabbitmq';
@@ -11,6 +12,7 @@ ValidateEnv();
 
 const setDatabase = (): Promise<void> => {
 	// Set Database Here
+  initializeDatabase();
 	return Promise.resolve();
 };
 
