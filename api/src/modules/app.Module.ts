@@ -1,6 +1,6 @@
 import { mergeRouters } from '@/config/trpc';
 import { userCronJobModule, userModule } from './users/users.Module';
-import { notificationModule } from './notifications/notification.Module';
+import { notificationBullMqModule, notificationModule } from './notifications/notification.Module';
 import {
 	WorkerBullMq,
 	WorkerCronJob,
@@ -18,7 +18,7 @@ type TRPCAppRouter = typeof trpcModulesFederation;
 
 // Workers
 const cronJobWorkerModules: WorkerCronJob[] = [...userCronJobModule];
-const bullMqWorkerModules: WorkerBullMq[] = [];
+const bullMqWorkerModules: WorkerBullMq[] = [...notificationBullMqModule];
 const pusherWorkerModules: WorkerPusher[] = [];
 const rabbitMqWorkerModules: WorkerRabbitMq[] = [];
 const kafkaWorkerModules: WorkerKafka[] = [];

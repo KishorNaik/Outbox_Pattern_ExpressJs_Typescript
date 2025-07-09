@@ -17,42 +17,28 @@ import {
   VOID_RESULT,
   IServiceHandlerNoParamsVoidAsync,
 } from '@kishornaik/utils';
-import { GetOutboxListService } from './services/getOutBoxList';
-import { SendEmailEventService } from './services/sendEmailEvent';
+import { GetOutboxListService as OutboxListService } from './services/getOutBoxList';
+import { PublishWelcomeUserEmailEventService } from './services/sendEmailEvent';
 import { OutboxBatchService } from './services/batch';
 
-const requestQueue = 'send-email-queue';
+const requestQueue = 'welcome-user-email-queue';
 const producer = new RequestReplyProducerBullMq(bullMqRedisConnection);
 producer.setQueues(requestQueue).setQueueEvents();
 
-export const sendEmailEventCronJob: WorkerCronJob = async () => {
-	const job = new CronJob(
-		`*/20 * * * * *`,
-		async () => {
-			logger.info(`SendEmailEventCronJob started....`);
-			await Container.get(PublishSendEmailIntegrationEvent).handleAsync();
-      logger.info(`SendEmailEventCronJob ended....`);
-		},
-		null,
-		false
-	);
-	job.start();
-};
-
-interface IPublishSendEmailIntegrationEvent extends IServiceHandlerNoParamsVoidAsync{}
+export interface IWelcomeUserEmailPublishIntegrationEventService extends IServiceHandlerNoParamsVoidAsync{}
 
 
 @sealed
 @Service()
-class PublishSendEmailIntegrationEvent implements IPublishSendEmailIntegrationEvent{
+export class WelcomeUserEmailPublishIntegrationEventService implements IWelcomeUserEmailPublishIntegrationEventService{
 
-  private readonly _getOutboxListService:GetOutboxListService;
-  private readonly _sendEmailEventService:SendEmailEventService;
+  private readonly _getOutboxListService:OutboxListService;
+  private readonly _sendEmailEventService:PublishWelcomeUserEmailEventService;
   private readonly _outboxBatchService:OutboxBatchService;
 
   public constructor(){
-    this._getOutboxListService = Container.get(GetOutboxListService);
-    this._sendEmailEventService=Container.get(SendEmailEventService);
+    this._getOutboxListService = Container.get(OutboxListService);
+    this._sendEmailEventService=Container.get(PublishWelcomeUserEmailEventService);
     this._outboxBatchService=Container.get(OutboxBatchService);
   }
 

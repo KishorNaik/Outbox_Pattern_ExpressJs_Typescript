@@ -1,10 +1,10 @@
 import { Enumerable, IServiceHandlerVoidAsync, RequestReplyProducerBullMq, Result, ResultError, ResultFactory, sealed, Service, tryCatchResultAsync, tryCatchSagaAsync, VOID_RESULT, VoidResult } from "@kishornaik/utils";
-import { SendEmailEventService } from "../sendEmailEvent";
+import { PublishWelcomeUserEmailEventService } from "../sendEmailEvent";
 import { OutboxEntity } from "@kishornaik/db";
 
 export interface IOutboxBatchParameters{
   outboxList:OutboxEntity[];
-  service:SendEmailEventService;
+  service:PublishWelcomeUserEmailEventService;
   producer:RequestReplyProducerBullMq;
 }
 

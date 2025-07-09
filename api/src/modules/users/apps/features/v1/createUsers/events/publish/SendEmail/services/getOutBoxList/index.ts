@@ -3,18 +3,18 @@ import { Container, IServiceHandlerAsync, Result, ResultError, ResultFactory, se
 
 Container.set<GetOutboxDbService>(GetOutboxDbService, new GetOutboxDbService());
 
-export interface IGetOutboxListServiceParameters {
+export interface IOutboxListServiceParameters {
   eventType:string;
 }
 
 
-export interface IGetOutboxListService extends IServiceHandlerAsync<IGetOutboxListServiceParameters,OutboxEntity[]>{
+export interface IOutboxListService extends IServiceHandlerAsync<IOutboxListServiceParameters,OutboxEntity[]>{
 
 }
 
 @sealed
 @Service()
-export class GetOutboxListService implements IGetOutboxListService {
+export class GetOutboxListService implements IOutboxListService {
 
   private readonly _getOutboxDbService:GetOutboxDbService;
 
@@ -22,7 +22,7 @@ export class GetOutboxListService implements IGetOutboxListService {
     this._getOutboxDbService = Container.get(GetOutboxDbService);
   }
 
-  public async handleAsync(params: IGetOutboxListServiceParameters): Promise<Result<OutboxEntity[], ResultError>> {
+  public async handleAsync(params: IOutboxListServiceParameters): Promise<Result<OutboxEntity[], ResultError>> {
     const queryRunner = getQueryRunner();
 		await queryRunner.connect();
     try
@@ -34,11 +34,12 @@ export class GetOutboxListService implements IGetOutboxListService {
 
       await queryRunner.startTransaction();
 
+      // Map Dto
       const getOutboxDto=new GetOutboxDbDto();
       getOutboxDto.eventType=eventType;
       getOutboxDto.take=12;
 
-
+      // Db Service
       const result=await this._getOutboxDbService.handleAsync({
         queryRunner:queryRunner,
         request:getOutboxDto

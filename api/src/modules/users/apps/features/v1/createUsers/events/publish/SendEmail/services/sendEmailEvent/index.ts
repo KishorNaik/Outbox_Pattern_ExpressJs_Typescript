@@ -5,25 +5,25 @@ import { randomUUID } from "crypto";
 
 Container.set<UpdateOutboxDbService>(UpdateOutboxDbService, new UpdateOutboxDbService());
 
-export interface ISendEmailEventServiceParameters{
+export interface IPublishWelcomeUserEmailEventServiceParameters{
   producer:RequestReplyProducerBullMq;
   outbox:OutboxEntity;
 }
 
-export interface ISendEmailEventService extends IServiceHandlerVoidAsync<ISendEmailEventServiceParameters>{
+export interface IPublishWelcomeUserEmailEventService extends IServiceHandlerVoidAsync<IPublishWelcomeUserEmailEventServiceParameters>{
 
 }
 
 @sealed
 @Service()
-export class SendEmailEventService implements ISendEmailEventService{
+export class PublishWelcomeUserEmailEventService implements IPublishWelcomeUserEmailEventService{
 
   private readonly _updateOutboxDbService:UpdateOutboxDbService
   public constructor(){
     this._updateOutboxDbService = Container.get(UpdateOutboxDbService);
   }
 
-  public async handleAsync(params: ISendEmailEventServiceParameters): Promise<Result<VoidResult, ResultError>> {
+  public async handleAsync(params: IPublishWelcomeUserEmailEventServiceParameters): Promise<Result<VoidResult, ResultError>> {
 
     return tryCatchResultAsync(async ()=>{
 
