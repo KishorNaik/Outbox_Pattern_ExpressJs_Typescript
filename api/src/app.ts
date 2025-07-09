@@ -17,13 +17,6 @@ import actuator from 'express-actuator';
 import { rateLimitMiddleware } from './middlewares/security/rateLimit';
 import traceMiddleware from './middlewares/loggers/trace';
 import httpLoggerMiddleware from './middlewares/loggers/http';
-import {
-	BullMqRunner,
-	RabbitMqRunner,
-	KafkaRunner,
-	PusherRunner,
-	CronJobRunner,
-} from '@kishornaik/utils';
 import { ipTrackerMiddleware } from './middlewares/security/ipTracker';
 import { throttlingMiddleware } from './middlewares/security/throttling';
 import { TRPCAppRouter } from './modules/app.Module';
@@ -35,11 +28,6 @@ export class App {
 	public env: string;
 	public port: string | number;
 	private _initializeDatabase: Function;
-	private _bullMqRunner: BullMqRunner | undefined;
-	private _rabbitMqRunner: RabbitMqRunner | undefined;
-	private _kafkaRunner: KafkaRunner | undefined;
-	private _pusherRunner: PusherRunner | undefined;
-	private _cronJobRunner: CronJobRunner | undefined;
 
 	constructor() {
 		this.app = express();
@@ -58,7 +46,7 @@ export class App {
 			controllers: controllers,
 			defaultErrorHandler: false,
 		});
-		logger.info(`======= initialized rest api routes =======`);
+		logger.info(`======= ✅ initialized rest api routes =======`);
 
 		this.initializeSwagger(controllers);
 
@@ -76,64 +64,33 @@ export class App {
 				})
 			);
 
-			logger.info(`======= initialized trpc routes =======`);
+			logger.info(`======= ✅ initialized trpc routes =======`);
 		}
 		return this;
 	}
 
 	public initializeDatabase(init?: Function | undefined) {
-		console.log('testDB Function init');
 		this._initializeDatabase = init;
 		return this;
 	}
 
 	public initializeErrorHandling() {
 		this.app.use(ErrorMiddleware);
-		logger.info(`======= initialized error handling =======`);
+		logger.info(`======= ✅ initialized error handling =======`);
 
-		return this;
-	}
-
-	public runBullMqWorker(bullMqRunner: BullMqRunner) {
-		this._bullMqRunner = bullMqRunner;
-		return this;
-	}
-
-	public runRabbitMqWorker(rabbitMqRunner: RabbitMqRunner) {
-		this._rabbitMqRunner = rabbitMqRunner;
-		return this;
-	}
-
-	public runKafkaWorker(kafkaRunner: KafkaRunner) {
-		this._kafkaRunner = kafkaRunner;
-		return this;
-	}
-
-	public runPusherWorker(pusherRunner: PusherRunner) {
-		this._pusherRunner = pusherRunner;
-		return this;
-	}
-
-	public runCronJobWorker(cronJobRunner: CronJobRunner) {
-		this._cronJobRunner = cronJobRunner;
 		return this;
 	}
 
 	public listen() {
 		this.app.listen(this.port, async () => {
-			logger.info(`=================================`);
+			logger.info(`✅=================================✅`);
 			logger.info(`======= ENV: ${this.env} =======`);
 			logger.info(`🚀 App listening on the port ${this.port}`);
-			logger.info(`=================================`);
+			logger.info(`✅=================================✅`);
 
 			await this.executeDatabase();
-			await this.executeBullMqWorker();
-			await this.executeRabbitMqWorker();
-			await this.executeKafkaWorker();
-			await this.executePusherWorker();
-			await this.executeCronJobWorker();
 
-			logger.info(`=== Server Started. Good to go ===`);
+			logger.info(`=== ✅ Server Started. Good to go ===`);
 			logger.info(`===🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀===`);
 		});
 	}
@@ -157,7 +114,7 @@ export class App {
 		this.app.use(throttlingMiddleware);
 		this.app.use(ipTrackerMiddleware);
 
-		logger.info(`======= initialized middlewares =======`);
+		logger.info(`======= ✅ initialized middlewares =======`);
 	}
 
 	private initializeSwagger(controllers: Function[]) {
@@ -200,58 +157,13 @@ export class App {
 		});
 		//console.log(JSON.stringify(spec));
 		this.app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(spec));
-		logger.info(`======= initialized swagger =======`);
+		logger.info(`======= ✅ initialized swagger =======`);
 	}
 
 	private async executeDatabase(): Promise<void> {
 		if (this._initializeDatabase) {
 			await this._initializeDatabase();
-			logger.info(`======= initialized database =======`);
-		}
-	}
-
-	private async executeBullMqWorker(): Promise<void> {
-		if (this?._bullMqRunner) {
-			if (this._bullMqRunner.count >= 1) {
-				await this._bullMqRunner.runWorkers();
-				logger.info(`======= initialized BullMQ workers =======`);
-			}
-		}
-	}
-
-	private async executeRabbitMqWorker(): Promise<void> {
-		if (this?._rabbitMqRunner) {
-			if (this._rabbitMqRunner.count >= 1) {
-				await this._rabbitMqRunner.runWorkers();
-				logger.info(`======= initialized RabbitMQ workers =======`);
-			}
-		}
-	}
-
-	private async executeKafkaWorker(): Promise<void> {
-		if (this?._kafkaRunner) {
-			if (this._kafkaRunner.count >= 1) {
-				await this._kafkaRunner.runWorkers();
-				logger.info(`======= initialized Kafka workers =======`);
-			}
-		}
-	}
-
-	private async executePusherWorker(): Promise<void> {
-		if (this?._pusherRunner) {
-			if (this._pusherRunner.count >= 1) {
-				await this._pusherRunner.runWorkers();
-				logger.info(`======= initialized Pusher workers =======`);
-			}
-		}
-	}
-
-	private async executeCronJobWorker(): Promise<void> {
-		if (this?._cronJobRunner) {
-			if (this._cronJobRunner.count >= 1) {
-				await this._cronJobRunner.runWorkers();
-				logger.info(`======= initialized Cron Job workers =======`);
-			}
+			logger.info(`=======✅ initialized database =======`);
 		}
 	}
 }

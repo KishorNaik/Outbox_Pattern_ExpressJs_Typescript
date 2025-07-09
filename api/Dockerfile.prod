@@ -11,6 +11,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY .swcrc ./
 COPY .env ./
+COPY ecosystem.config.js ./
 
 # Install dependencies with legacy-peer-deps
 RUN npm install --legacy-peer-deps && npm cache clean --force
@@ -33,9 +34,11 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/.swcrc ./
 COPY --from=builder /app/.env ./
+COPY --from=builder /app/ecosystem.config.js ./
 
 # Expose production ports
 EXPOSE 8080
 
 # Start application in production mode
-CMD ["npm", "run", "start"]
+CMD ["pm2-runtime", "ecosystem.config.js", "--only", "prod,cron-worker,bullmq-worker,rabbitmq-worker,kafka-worker,pusher-worker"]
+

@@ -1,1 +1,1 @@
-export const notificationModule:Function[]=[];
+export const notificationModule: Function[] = [];

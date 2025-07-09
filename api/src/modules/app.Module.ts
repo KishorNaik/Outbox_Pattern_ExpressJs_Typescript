@@ -1,12 +1,35 @@
 import { mergeRouters } from '@/config/trpc';
-import { userModule } from './users/users.Module';
+import { userCronJobModule, userModule } from './users/users.Module';
 import { notificationModule } from './notifications/notification.Module';
+import {
+	WorkerBullMq,
+	WorkerCronJob,
+	WorkerKafka,
+	WorkerPusher,
+	WorkerRabbitMq,
+} from '@kishornaik/utils';
 
 // REST API
-const restApiModulesFederation: Function[] = [...userModule,...notificationModule];
+const restApiModulesFederation: Function[] = [...userModule, ...notificationModule];
 
 // TRPC
 const trpcModulesFederation = mergeRouters();
 type TRPCAppRouter = typeof trpcModulesFederation;
 
-export { restApiModulesFederation, trpcModulesFederation, TRPCAppRouter };
+// Workers
+const cronJobWorkerModules: WorkerCronJob[] = [...userCronJobModule];
+const bullMqWorkerModules: WorkerBullMq[] = [];
+const pusherWorkerModules: WorkerPusher[] = [];
+const rabbitMqWorkerModules: WorkerRabbitMq[] = [];
+const kafkaWorkerModules: WorkerKafka[] = [];
+
+export {
+	restApiModulesFederation,
+	trpcModulesFederation,
+	TRPCAppRouter,
+	cronJobWorkerModules,
+	bullMqWorkerModules,
+	pusherWorkerModules,
+	rabbitMqWorkerModules,
+	kafkaWorkerModules,
+};

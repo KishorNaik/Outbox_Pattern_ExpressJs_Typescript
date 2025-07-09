@@ -1,10 +1,6 @@
 {
 	"folders": [
 		{
-			"name": "Outbox_Pattern_ExpressJs_Typescript",
-			"path": "."
-		},
-		{
 			"name": "utils",
 			"path": "utils"
 		},

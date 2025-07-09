@@ -26,6 +26,7 @@
 			"@modules": ["modules/*"],
 			"@middlewares/*": ["middlewares/*"],
 			"@shared/*": ["shared/*"],
+			"@workers/*": ["workers/*"],
 			"@zone/*": ["zone/*"]
 		}
 	},

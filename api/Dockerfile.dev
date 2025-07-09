@@ -11,6 +11,7 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 COPY .swcrc ./
 COPY .env ./
+COPY ecosystem.config.js ./
 
 # Install dependencies with legacy-peer-deps
 RUN npm install --legacy-peer-deps && npm cache clean --force
@@ -25,4 +26,4 @@ RUN npm run start:build
 EXPOSE 3000
 
 # Start application in development mode
-CMD ["npm", "run", "start:dev"]
+CMD ["pm2-runtime", "ecosystem.config.js", "--only", "dev,cron-worker-dev,bullmq-worker-dev,rabbitmq-worker-dev,kafka-worker-dev,pusher-worker-dev"]

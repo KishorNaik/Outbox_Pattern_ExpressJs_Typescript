@@ -63,93 +63,99 @@ class CreateUserCommand extends RequestData<ApiDataResponse<CreateUsersResponseD
 	}
 }
 
-enum CreateUserPipelineSteps{
-  MAP_ENTITY="MAP_ENTITY",
-  ADD_USER_DB_SERVICE="ADD_USER_DB_SERVICE",
-  ADD_OUTBOX_DB_SERVICE="ADD_OUTBOX_DB_SERVICE",
-  MAP_RESPONSE="MAP_RESPONSE"
+enum CreateUserPipelineSteps {
+	MAP_ENTITY = 'MAP_ENTITY',
+	ADD_USER_DB_SERVICE = 'ADD_USER_DB_SERVICE',
+	ADD_OUTBOX_DB_SERVICE = 'ADD_OUTBOX_DB_SERVICE',
+	MAP_RESPONSE = 'MAP_RESPONSE',
 }
 
 @sealed
 @requestHandler(CreateUserCommand)
-class CreateUserCommandHandler implements RequestHandler<CreateUserCommand, ApiDataResponse<CreateUsersResponseDto>>{
+class CreateUserCommandHandler
+	implements RequestHandler<CreateUserCommand, ApiDataResponse<CreateUsersResponseDto>>
+{
+	private pipeline = new PipelineWorkflow(logger);
+	private readonly _createUserMapEntityService: CreateUserMapEntityService;
+	private readonly _createUserDbService: CreateUserDbService;
+	private readonly _createOutboxDbService: CreateOutboxDbService;
+	private readonly _createUserMapResponseService: CreateUserMapResponseService;
 
-  private pipeline = new PipelineWorkflow(logger);
-  private readonly _createUserMapEntityService:CreateUserMapEntityService;
-  private readonly _createUserDbService:CreateUserDbService;
-  private readonly _createOutboxDbService:CreateOutboxDbService;
-  private readonly _createUserMapResponseService:CreateUserMapResponseService;
+	public constructor() {
+		this._createUserMapEntityService = Container.get(CreateUserMapEntityService);
+		this._createUserDbService = Container.get(CreateUserDbService);
+		this._createOutboxDbService = Container.get(CreateOutboxDbService);
+		this._createUserMapResponseService = Container.get(CreateUserMapResponseService);
+	}
 
-  public constructor(){
-    this._createUserMapEntityService=Container.get(CreateUserMapEntityService);
-    this._createUserDbService=Container.get(CreateUserDbService);
-    this._createOutboxDbService=Container.get(CreateOutboxDbService);
-    this._createUserMapResponseService=Container.get(CreateUserMapResponseService);
-  }
-
-  public async handle(value: CreateUserCommand): Promise<ApiDataResponse<CreateUsersResponseDto>> {
-    const queryRunner = getQueryRunner();
+	public async handle(
+		value: CreateUserCommand
+	): Promise<ApiDataResponse<CreateUsersResponseDto>> {
+		const queryRunner = getQueryRunner();
 		await queryRunner.connect();
-    try
-    {
-      // Guard
-      if(!value)
-        return DataResponseFactory.error(StatusCodes.BAD_REQUEST, 'Value is required');
+		try {
+			// Guard
+			if (!value)
+				return DataResponseFactory.error(StatusCodes.BAD_REQUEST, 'Value is required');
 
-      if(!value.request)
-        return DataResponseFactory.error(StatusCodes.BAD_REQUEST, 'Request is required');
+			if (!value.request)
+				return DataResponseFactory.error(StatusCodes.BAD_REQUEST, 'Request is required');
 
-      const { request } = value;
+			const { request } = value;
 
-      // Start Transaction
-      await queryRunner.startTransaction();
+			// Start Transaction
+			await queryRunner.startTransaction();
 
-      // Map Entity
-      await this.pipeline.step(CreateUserPipelineSteps.MAP_ENTITY,()=>{
-        return this._createUserMapEntityService.handleAsync(request);
-      });
+			// Map Entity
+			await this.pipeline.step(CreateUserPipelineSteps.MAP_ENTITY, () => {
+				return this._createUserMapEntityService.handleAsync(request);
+			});
 
-      // Add User Db Service Pipeline
-      await this.pipeline.step(CreateUserPipelineSteps.ADD_USER_DB_SERVICE,async ()=>{
-        // Get Map Result;
-        const mapResult=this.pipeline.getResult<UserEntity>(CreateUserPipelineSteps.MAP_ENTITY);
+			// Add User Db Service Pipeline
+			await this.pipeline.step(CreateUserPipelineSteps.ADD_USER_DB_SERVICE, async () => {
+				// Get Map Result;
+				const mapResult = this.pipeline.getResult<UserEntity>(
+					CreateUserPipelineSteps.MAP_ENTITY
+				);
 
-        // Add User
-        return this._createUserDbService.handleAsync({user:mapResult,queryRunner});
-      });
+				// Add User
+				return this._createUserDbService.handleAsync({ user: mapResult, queryRunner });
+			});
 
-      // Add Outbox Db Service Pipeline
-      await this.pipeline.step(CreateUserPipelineSteps.ADD_OUTBOX_DB_SERVICE,async ()=>{
+			// Add Outbox Db Service Pipeline
+			await this.pipeline.step(CreateUserPipelineSteps.ADD_OUTBOX_DB_SERVICE, async () => {
+				// Get Map Result;
+				const mapResult = this.pipeline.getResult<UserEntity>(
+					CreateUserPipelineSteps.ADD_USER_DB_SERVICE
+				);
 
-        // Get Map Result;
-        const mapResult=this.pipeline.getResult<UserEntity>(CreateUserPipelineSteps.ADD_USER_DB_SERVICE);
+				// Add Outbox
+				return this._createOutboxDbService.handleAsync({ user: mapResult, queryRunner });
+			});
 
-        // Add Outbox
-        return this._createOutboxDbService.handleAsync({user:mapResult,queryRunner});
-      });
+			// Map Response
+			await this.pipeline.step(CreateUserPipelineSteps.MAP_RESPONSE, async () => {
+				// Get Map Result;
+				const mapResult = this.pipeline.getResult<UserEntity>(
+					CreateUserPipelineSteps.ADD_USER_DB_SERVICE
+				);
 
-      // Map Response
-      await this.pipeline.step(CreateUserPipelineSteps.MAP_RESPONSE,async ()=>{
-        // Get Map Result;
-        const mapResult=this.pipeline.getResult<UserEntity>(CreateUserPipelineSteps.ADD_USER_DB_SERVICE);
+				// Map
+				return this._createUserMapResponseService.handleAsync(mapResult);
+			});
 
-        // Map
-        return this._createUserMapResponseService.handleAsync(mapResult);
-      })
+			// Commit Transaction
+			await queryRunner.commitTransaction();
 
-      // Commit Transaction
-      await queryRunner.commitTransaction();
-
-      // Return
-      const response=this.pipeline.getResult<CreateUsersResponseDto>(CreateUserPipelineSteps.MAP_RESPONSE);
-      return DataResponseFactory.success(StatusCodes.CREATED, response,`User Created`);
-    }
-    catch(ex){
-      return await DataResponseFactory.pipelineError(ex, queryRunner);
-    }
-    finally{
-      await queryRunner.release();
-    }
-  }
-
+			// Return
+			const response = this.pipeline.getResult<CreateUsersResponseDto>(
+				CreateUserPipelineSteps.MAP_RESPONSE
+			);
+			return DataResponseFactory.success(StatusCodes.CREATED, response, `User Created`);
+		} catch (ex) {
+			return await DataResponseFactory.pipelineError(ex, queryRunner);
+		} finally {
+			await queryRunner.release();
+		}
+	}
 }

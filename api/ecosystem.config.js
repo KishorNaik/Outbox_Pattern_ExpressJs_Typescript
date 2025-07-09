@@ -6,55 +6,224 @@
  */
 module.exports = {
 	apps: [
+		// === PRODUCTION API ===
 		{
-			name: 'prod', // pm2 start App name
+			name: 'prod',
 			script: 'dist/server.js',
-			exec_mode: 'cluster', // 'cluster' or 'fork'
-			instance_var: 'INSTANCE_ID', // instance variable
-			instances: 2, // pm2 instance count
-			autorestart: true, // auto restart if process crash
-			watch: false, // files change automatic restart
-			ignore_watch: ['node_modules', 'logs'], // ignore files change
-			max_memory_restart: '1G', // restart if process use more than 1G memory
-			merge_logs: true, // if true, stdout and stderr will be merged and sent to pm2 log
-			output: './logs/access.log', // pm2 log file
-			error: './logs/error.log', // pm2 error log file
+			exec_mode: 'cluster',
+			instance_var: 'INSTANCE_ID',
+			instances: 'max',
+			autorestart: true,
+			watch: false,
+			ignore_watch: ['node_modules', 'logs'],
+			max_memory_restart: '1G',
+			merge_logs: true,
+			output: './logs/pm2/api/production/debug.log',
+			error: './logs/pm2/api/production/error.log',
 			env: {
-				// environment variable
+				NODE_ENV: 'production',
 				PORT: 3000,
+			},
+		},
+
+		// === DEVELOPMENT API ===
+		{
+			name: 'dev',
+			script: 'node',
+			args: '-r ts-node/register -r tsconfig-paths/register src/server.ts',
+			exec_mode: 'fork',
+			instance_var: 'INSTANCE_ID',
+			instances: 1,
+			autorestart: true,
+			watch: false,
+			ignore_watch: ['node_modules', 'logs'],
+			max_memory_restart: '1G',
+			merge_logs: true,
+			output: './logs/pm2/api/development/debug.log',
+			error: './logs/pm2/api/development/error.log',
+			env: {
+				NODE_ENV: 'development',
+				PORT: 3000,
+			},
+		},
+
+		// === PRODUCTION WORKERS ===
+		{
+			name: 'cron-worker',
+			script: 'dist/workers/cronJob/index.js',
+			exec_mode: 'fork', // or 'cluster' if it's a networked service
+			instance_var: 'INSTANCE_ID',
+			instances: 1,
+			autorestart: true,
+			watch: false,
+			ignore_watch: ['node_modules', 'logs'],
+			max_memory_restart: '1G',
+			merge_logs: true,
+			output: './logs/pm2/cron/production/debug.log',
+      error: './logs/pm2/cron/production/error.log',
+      env: {
+        NODE_ENV: 'production',
+      },
+		},
+		{
+			name: 'bullmq-worker',
+			script: 'dist/workers/bullMq/index.js',
+			exec_mode: 'fork', // or 'cluster' if it's a networked service
+			instance_var: 'INSTANCE_ID',
+			instances: 1,
+			autorestart: true,
+			watch: false,
+			ignore_watch: ['node_modules', 'logs'],
+			max_memory_restart: '1G',
+			merge_logs: true,
+			output: './logs/pm2/bullMq/production/debug.log',
+			error: './logs/pm2/bullMq/production/error.log',
+			env: {
 				NODE_ENV: 'production',
 			},
 		},
 		{
-			name: 'dev', // pm2 start App name
-			script: 'ts-node', // ts-node
-			args: '-r tsconfig-paths/register --transpile-only src/server.ts', // ts-node args
-			exec_mode: 'cluster', // 'cluster' or 'fork'
-			instance_var: 'INSTANCE_ID', // instance variable
-			instances: 2, // pm2 instance count
-			autorestart: true, // auto restart if process crash
-			watch: false, // files change automatic restart
-			ignore_watch: ['node_modules', 'logs'], // ignore files change
-			max_memory_restart: '1G', // restart if process use more than 1G memory
-			merge_logs: true, // if true, stdout and stderr will be merged and sent to pm2 log
-			output: './logs/access.log', // pm2 log file
-			error: './logs/error.log', // pm2 error log file
+			name: 'rabbitmq-worker',
+			script: 'dist/workers/rabbitMq/index.js',
+			exec_mode: 'fork', // or 'cluster' if it's a networked service
+			instance_var: 'INSTANCE_ID',
+			instances: 1,
+			autorestart: true,
+			watch: false,
+			ignore_watch: ['node_modules', 'logs'],
+			max_memory_restart: '1G',
+			merge_logs: true,
+			output: './logs/pm2/rabbitMq/production/debug.log',
+			error: './logs/pm2/rabbitMq/production/error.log',
 			env: {
-				// environment variable
-				PORT: 3000,
+				NODE_ENV: 'production',
+			},
+		},
+		{
+			name: 'kafka-worker',
+			script: 'dist/workers/kafka/index.js',
+			exec_mode: 'fork', // or 'cluster' if it's a networked service
+			instance_var: 'INSTANCE_ID',
+			instances: 1,
+			autorestart: true,
+			watch: false,
+			ignore_watch: ['node_modules', 'logs'],
+			max_memory_restart: '1G',
+			merge_logs: true,
+			output: './logs/pm2/kafka/production/debug.log',
+      error: './logs/pm2/kafka/production/error.log',
+      env: {
+        NODE_ENV: 'production',
+      },
+		},
+		{
+			name: 'pusher-worker',
+			script: 'dist/workers/pusher/index.js',
+			exec_mode: 'fork', // or 'cluster' if it's a networked service
+			instance_var: 'INSTANCE_ID',
+			instances: 1,
+			autorestart: true,
+			watch: false,
+			ignore_watch: ['node_modules', 'logs'],
+			max_memory_restart: '1G',
+			merge_logs: true,
+			output: './logs/pm2/pusher/production/debug.log',
+      error: './logs/pm2/pusher/production/error.log',
+      env: {
+        NODE_ENV: 'production',
+      },
+		},
+
+		// === DEVELOPMENT WORKERS ===
+		{
+			name: 'cron-worker-dev',
+			script: 'node',
+			args: '-r ts-node/register -r tsconfig-paths/register src/workers/cronJob/index.ts',
+			exec_mode: 'fork', // or 'cluster' if it's a networked service
+			instance_var: 'INSTANCE_ID',
+			instances: 1,
+			autorestart: true,
+			watch: false,
+			ignore_watch: ['node_modules', 'logs'],
+			max_memory_restart: '1G',
+			merge_logs: true,
+			output: './logs/pm2/cronJob/development/debug.log',
+			error: './logs/pm2/cronJob/development/error.log',
+			env: {
+				NODE_ENV: 'development',
+			}
+		},
+		{
+			name: 'bullmq-worker-dev',
+			script: 'node',
+			args: '-r ts-node/register -r tsconfig-paths/register src/workers/bullMq/index.ts',
+			exec_mode: 'fork', // or 'cluster' if it's a networked service
+			instance_var: 'INSTANCE_ID',
+			instances: 1,
+			autorestart: true,
+			watch: false,
+			ignore_watch: ['node_modules', 'logs'],
+			max_memory_restart: '1G',
+			merge_logs: true,
+			output: './logs/pm2/bullMq/development/debug.log',
+			error: './logs/pm2/bullMq/development/error.log',
+			env: {
+				NODE_ENV: 'development',
+			},
+		},
+		{
+			name: 'rabbitmq-worker-dev',
+			script: 'node',
+			args: '-r ts-node/register -r tsconfig-paths/register src/workers/rabbitMq/index.ts',
+			exec_mode: 'fork', // or 'cluster' if it's a networked service
+			instance_var: 'INSTANCE_ID',
+			instances: 1,
+			autorestart: true,
+			watch: false,
+			ignore_watch: ['node_modules', 'logs'],
+			max_memory_restart: '1G',
+			merge_logs: true,
+			output: './logs/pm2/rabbitMq/development/debug.log',
+      error: './logs/pm2/rabbitMq/development/error.log',
+      env: {
+        NODE_ENV: 'development',
+      },
+		},
+		{
+			name: 'kafka-worker-dev',
+			script: 'node',
+			args: '-r ts-node/register -r tsconfig-paths/register src/workers/kafka/index.ts',
+			exec_mode: 'fork', // or 'cluster' if it's a networked service
+			instance_var: 'INSTANCE_ID',
+			instances: 1,
+			autorestart: true,
+			watch: false,
+			ignore_watch: ['node_modules', 'logs'],
+			max_memory_restart: '1G',
+			merge_logs: true,
+			output: './logs/pm2/kafka/development/debug.log',
+			error: './logs/pm2/kafka/development/error.log',
+			env: {
+				NODE_ENV: 'development',
+			},
+		},
+		{
+			name: 'pusher-worker-dev',
+			script: 'node',
+			args: '-r ts-node/register -r tsconfig-paths/register src/workers/pusher/index.ts',
+			exec_mode: 'fork', // or 'cluster' if it's a networked service
+			instance_var: 'INSTANCE_ID',
+			instances: 1,
+			autorestart: true,
+			watch: false,
+			ignore_watch: ['node_modules', 'logs'],
+			max_memory_restart: '1G',
+			merge_logs: true,
+			output: './logs/pm2/pusher/development/debug.log',
+			error: './logs/pm2/pusher/development/error.log',
+			env: {
 				NODE_ENV: 'development',
 			},
 		},
 	],
-	deploy: {
-		production: {
-			user: 'user',
-			host: '0.0.0.0',
-			ref: 'origin/master',
-			repo: 'git@github.com:repo.git',
-			path: 'dist/server.js',
-			'post-deploy':
-				'npm install && npm run build && pm2 reload ecosystem.config.js --only prod',
-		},
-	},
 };

@@ -24,7 +24,8 @@
 			"@config": ["config"],
 			"@modules": ["modules/*"],
 			"@middlewares/*": ["middlewares/*"],
-			"@shared/*": ["shared/*"]
+			"@shared/*": ["shared/*"],
+			"@workers/*": ["workers/*"]
 		}
 	},
 	"module": {

@@ -10,11 +10,11 @@ import { CreateUsersRequestDto } from '@/modules/users/apps/features/v1/createUs
 process.env.NODE_ENV = 'development';
 ValidateEnv();
 
-const appInstance=new App();
-const app=appInstance
-  .initializeRestApiRoutes([...restApiModulesFederation])
-  .initializeErrorHandling()
-  .getServer();
+const appInstance = new App();
+const app = appInstance
+	.initializeRestApiRoutes([...restApiModulesFederation])
+	.initializeErrorHandling()
+	.getServer();
 
 describe(`Create-User-Integration-Test`, () => {
 	//node --trace-deprecation --test --test-name-pattern='should_return_false_when_validation_service_failed' --require ts-node/register -r tsconfig-paths/register ./src/modules/users/tests/integration/features/v1/createUsers/index.test.ts
