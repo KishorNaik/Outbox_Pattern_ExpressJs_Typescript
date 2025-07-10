@@ -46,6 +46,7 @@ export class OutboxBatchService implements IOutboxBatchService {
         handler: (outbox) => service.handleAsync({ outbox:outbox, producer: producer }),
         batchSize: 3,
         concurrency: 3, // Optional throttle
+        runMode: 'parallel'
       });
 
       if(results.error.length>=1){
