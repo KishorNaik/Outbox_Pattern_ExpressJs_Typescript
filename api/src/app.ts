@@ -96,7 +96,7 @@ export class App {
 			logger.info(`===🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀🚀===`);
 		});
 
-    return this;
+		return this;
 	}
 
 	public getServer() {
@@ -117,6 +117,7 @@ export class App {
 		this.app.use(traceMiddleware);
 		this.app.use(throttlingMiddleware);
 		this.app.use(ipTrackerMiddleware);
+    this.app.disable('x-powered-by');
 
 		logger.info(`======= ✅ initialized middlewares =======`);
 	}
@@ -171,42 +172,37 @@ export class App {
 		}
 	}
 
-  public gracefulShutdown(shutDownTasks?:ShutdownTask){
-    const signals: NodeJS.Signals[] = ['SIGINT', 'SIGTERM'];
+	public gracefulShutdown(shutDownTasks?: ShutdownTask) {
+		const signals: NodeJS.Signals[] = ['SIGINT', 'SIGTERM'];
 
-    for (const signal of signals) {
-      process.once(signal, () => {
-        logger.info(`🚦 Received ${signal}. Starting graceful shutdown...`);
+		for (const signal of signals) {
+			process.once(signal, () => {
+				logger.info(`🚦 Received ${signal}. Starting graceful shutdown...`);
 
-        const server = this.app.listen(this.port);
+				const server = this.app.listen(this.port);
 
-        server.close(async () => {
-          logger.info('🛑 HTTP server closed.');
+				server.close(async () => {
+					logger.info('🛑 HTTP server closed.');
 
-          try {
-            if(shutDownTasks)
-            {
-              await shutDownTasks(); // Execute your custom teardown logic
-              logger.info('✅ Shutdown task completed. Exiting process.');
-            }
-            else
-            {
-              logger.info('❌ Shutdown task not found. Exiting process.');
-            }
-          } catch (err) {
-            logger.error('❌ Shutdown task failed:', err);
-          }
+					try {
+						if (shutDownTasks) {
+							await shutDownTasks(); // Execute your custom teardown logic
+							logger.info('✅ Shutdown task completed. Exiting process.');
+						} else {
+							logger.info('❌ Shutdown task not found. Exiting process.');
+						}
+					} catch (err) {
+						logger.error('❌ Shutdown task failed:', err);
+					}
 
-          process.exit(0);
-        });
+					process.exit(0);
+				});
 
-        setTimeout(() => {
-          logger.error('⏱ Force exit after timeout.');
-          process.exit(1);
-        }, 5000).unref();
-
-      });
-    }
-
-  }
+				setTimeout(() => {
+					logger.error('⏱ Force exit after timeout.');
+					process.exit(1);
+				}, 5000).unref();
+			});
+		}
+	}
 }

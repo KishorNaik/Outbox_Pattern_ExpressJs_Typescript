@@ -60,10 +60,10 @@ module.exports = {
 			max_memory_restart: '1G',
 			merge_logs: true,
 			output: './logs/pm2/cron/production/debug.log',
-      error: './logs/pm2/cron/production/error.log',
-      env: {
-        NODE_ENV: 'production',
-      },
+			error: './logs/pm2/cron/production/error.log',
+			env: {
+				NODE_ENV: 'production',
+			},
 		},
 		{
 			name: 'bullmq-worker',
@@ -111,10 +111,10 @@ module.exports = {
 			max_memory_restart: '1G',
 			merge_logs: true,
 			output: './logs/pm2/kafka/production/debug.log',
-      error: './logs/pm2/kafka/production/error.log',
-      env: {
-        NODE_ENV: 'production',
-      },
+			error: './logs/pm2/kafka/production/error.log',
+			env: {
+				NODE_ENV: 'production',
+			},
 		},
 		{
 			name: 'pusher-worker',
@@ -128,10 +128,10 @@ module.exports = {
 			max_memory_restart: '1G',
 			merge_logs: true,
 			output: './logs/pm2/pusher/production/debug.log',
-      error: './logs/pm2/pusher/production/error.log',
-      env: {
-        NODE_ENV: 'production',
-      },
+			error: './logs/pm2/pusher/production/error.log',
+			env: {
+				NODE_ENV: 'production',
+			},
 		},
 
 		// === DEVELOPMENT WORKERS ===
@@ -151,7 +151,7 @@ module.exports = {
 			error: './logs/pm2/cronJob/development/error.log',
 			env: {
 				NODE_ENV: 'development',
-			}
+			},
 		},
 		{
 			name: 'bullmq-worker-dev',
@@ -184,10 +184,10 @@ module.exports = {
 			max_memory_restart: '1G',
 			merge_logs: true,
 			output: './logs/pm2/rabbitMq/development/debug.log',
-      error: './logs/pm2/rabbitMq/development/error.log',
-      env: {
-        NODE_ENV: 'development',
-      },
+			error: './logs/pm2/rabbitMq/development/error.log',
+			env: {
+				NODE_ENV: 'development',
+			},
 		},
 		{
 			name: 'kafka-worker-dev',

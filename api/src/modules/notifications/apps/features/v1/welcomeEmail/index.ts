@@ -1,1 +1,1 @@
-export * from "./events/subscribe/index";
+export * from './events/subscribe/index';

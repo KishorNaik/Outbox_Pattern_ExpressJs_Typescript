@@ -13,9 +13,9 @@ const runServer = () => {
 		.initializeDatabase(setDatabase)
 		.initializeErrorHandling()
 		.listen()
-    .gracefulShutdown(async ()=>{
-      await destroyDatabase();
-    });
+		.gracefulShutdown(async () => {
+			await destroyDatabase();
+		});
 };
 
-runServer()
+runServer();
