@@ -95,7 +95,8 @@
 		"typeorm": "^0.3.24",
 		"uuid": "^11.1.0",
 		"winston": "^3.17.0",
-		"winston-daily-rotate-file": "^5.0.0"
+		"winston-daily-rotate-file": "^5.0.0",
+		"workerpool": "^9.3.3"
 	},
 	"publishConfig": {
 		"registry": "https://npm.pkg.github.com"
