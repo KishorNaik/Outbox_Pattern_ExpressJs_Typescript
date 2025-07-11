@@ -34,12 +34,12 @@ export class WelcomeUserEmailPublishIntegrationEventService
 	implements IWelcomeUserEmailPublishIntegrationEventService
 {
 	private readonly _getOutboxListService: OutboxListService;
-	private readonly _sendEmailEventService: PublishWelcomeUserEmailEventService;
+	private readonly _publishEmailEventService: PublishWelcomeUserEmailEventService;
 	private readonly _outboxBatchService: OutboxBatchService;
 
 	public constructor() {
 		this._getOutboxListService = Container.get(OutboxListService);
-		this._sendEmailEventService = Container.get(PublishWelcomeUserEmailEventService);
+		this._publishEmailEventService = Container.get(PublishWelcomeUserEmailEventService);
 		this._outboxBatchService = Container.get(OutboxBatchService);
 	}
 
@@ -59,7 +59,7 @@ export class WelcomeUserEmailPublishIntegrationEventService
 			// Batch Wise Execution
 			await this._outboxBatchService.handleAsync({
 				outboxList: outboxList,
-				service: this._sendEmailEventService,
+				service: this._publishEmailEventService,
 				producer: producer,
 			});
 
