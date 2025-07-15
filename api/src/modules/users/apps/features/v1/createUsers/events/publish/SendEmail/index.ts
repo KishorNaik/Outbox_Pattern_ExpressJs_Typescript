@@ -77,7 +77,7 @@ export class WelcomeUserEmailPublishIntegrationEventService
 			const outboxList = outboxListResult.value;
 			logger.info(`outbox list length ${outboxList.length}`);
 
-			// Batch Wise Execution
+			// Batch Wise Outbox Execution with update db
 			await this._outboxBatchService.handleAsync({
 				outboxList: outboxList,
 				services: {
