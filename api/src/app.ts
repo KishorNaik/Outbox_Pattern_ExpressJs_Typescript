@@ -117,7 +117,7 @@ export class App {
 		this.app.use(traceMiddleware);
 		this.app.use(throttlingMiddleware);
 		this.app.use(ipTrackerMiddleware);
-    this.app.disable('x-powered-by');
+		this.app.disable('x-powered-by');
 
 		logger.info(`======= ✅ initialized middlewares =======`);
 	}

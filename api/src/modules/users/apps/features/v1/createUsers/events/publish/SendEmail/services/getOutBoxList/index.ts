@@ -1,4 +1,10 @@
-import { GetOutboxDbDto, GetOutboxDbService, getQueryRunner, OutboxEntity,QueryRunner } from '@kishornaik/db';
+import {
+	GetOutboxDbDto,
+	GetOutboxDbService,
+	getQueryRunner,
+	OutboxEntity,
+	QueryRunner,
+} from '@kishornaik/db';
 import {
 	Container,
 	IServiceHandlerAsync,
@@ -15,7 +21,7 @@ Container.set<GetOutboxDbService>(GetOutboxDbService, new GetOutboxDbService());
 
 export interface IOutboxListServiceParameters {
 	eventType: string;
-  queryRunner: QueryRunner;
+	queryRunner: QueryRunner;
 }
 
 export interface IOutboxListService
@@ -33,18 +39,16 @@ export class GetOutboxListService implements IOutboxListService {
 	public async handleAsync(
 		params: IOutboxListServiceParameters
 	): Promise<Result<OutboxEntity[], ResultError>> {
-
 		try {
-			if (!params)
-        return ResultFactory.error(StatusCodes.BAD_REQUEST, 'Value is required');
+			if (!params) return ResultFactory.error(StatusCodes.BAD_REQUEST, 'Value is required');
 
-      if(!params.eventType)
-        return ResultFactory.error(StatusCodes.BAD_REQUEST, 'eventType is required');
+			if (!params.eventType)
+				return ResultFactory.error(StatusCodes.BAD_REQUEST, 'eventType is required');
 
-      if(!params.queryRunner)
-        return ResultFactory.error(StatusCodes.BAD_REQUEST, 'queryRunner is required');
+			if (!params.queryRunner)
+				return ResultFactory.error(StatusCodes.BAD_REQUEST, 'queryRunner is required');
 
-      const { eventType,queryRunner } = params;
+			const { eventType, queryRunner } = params;
 
 			// Map Dto
 			const getOutboxDto = new GetOutboxDbDto();

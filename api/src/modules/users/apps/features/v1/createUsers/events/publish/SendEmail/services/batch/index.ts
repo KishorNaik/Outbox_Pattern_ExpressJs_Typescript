@@ -12,17 +12,17 @@ import {
 	VoidResult,
 } from '@kishornaik/utils';
 import { PublishWelcomeUserEmailEventService } from '../sendEmailEvent';
-import { OutboxEntity, UpdateOutboxDbService,QueryRunner } from '@kishornaik/db';
+import { OutboxEntity, UpdateOutboxDbService, QueryRunner } from '@kishornaik/db';
 import { logger } from '@/shared/utils/helpers/loggers';
 
 export interface IOutboxBatchParameters {
 	outboxList: OutboxEntity[];
 	services: {
-    publishEventService: PublishWelcomeUserEmailEventService;
-    updateOutboxDbService: UpdateOutboxDbService;
-  }
+		publishEventService: PublishWelcomeUserEmailEventService;
+		updateOutboxDbService: UpdateOutboxDbService;
+	};
 	producer: RequestReplyProducerBullMq;
-  queryRunner: QueryRunner;
+	queryRunner: QueryRunner;
 }
 
 export interface IOutboxBatchService extends IServiceHandlerVoidAsync<IOutboxBatchParameters> {}
@@ -32,30 +32,28 @@ export interface IOutboxBatchService extends IServiceHandlerVoidAsync<IOutboxBat
 export class OutboxBatchService implements IOutboxBatchService {
 	public handleAsync(params: IOutboxBatchParameters): Promise<Result<VoidResult, ResultError>> {
 		return tryCatchResultAsync(async () => {
-
-			const { outboxList, services, producer,queryRunner } = params;
-      const { publishEventService, updateOutboxDbService } = services;
+			const { outboxList, services, producer, queryRunner } = params;
+			const { publishEventService, updateOutboxDbService } = services;
 
 			const results = await executeBatchArrayAsync({
 				items: outboxList,
 				handler: async (outbox) => {
-
-          var result = await publishEventService.handleAsync({
-            producer:producer,
-            outbox:outbox,
-            updateOutboxDbService:updateOutboxDbService,
-            queryRunner: queryRunner
-          });
-          if(result.isErr()){
-            logger.error(`Batch:Failed to send email to ${outbox.identifier}, error: ${result.error.message}`);
-          }
-          else
-          {
-            logger.info(`Batch:Email sent to ${outbox.identifier}`);
-          }
-          return result;
-          //return ResultFactory.success(VOID_RESULT);
-        },
+					var result = await publishEventService.handleAsync({
+						producer: producer,
+						outbox: outbox,
+						updateOutboxDbService: updateOutboxDbService,
+						queryRunner: queryRunner,
+					});
+					if (result.isErr()) {
+						logger.error(
+							`Batch:Failed to send email to ${outbox.identifier}, error: ${result.error.message}`
+						);
+					} else {
+						logger.info(`Batch:Email sent to ${outbox.identifier}`);
+					}
+					return result;
+					//return ResultFactory.success(VOID_RESULT);
+				},
 				batchSize: 3,
 				concurrency: 3, // Optional throttle
 				runMode: 'parallel',

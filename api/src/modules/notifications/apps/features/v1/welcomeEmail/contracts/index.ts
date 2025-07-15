@@ -1,4 +1,4 @@
-export interface WelcomeUserRequestDto{
-  fullName?:string;
-  email?:string;
+export interface WelcomeUserRequestDto {
+	fullName?: string;
+	email?: string;
 }
