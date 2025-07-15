@@ -170,7 +170,7 @@ cd <your-project-directory>
     npm run dev:bullmq
     ```
 📌 Note: 
-- Run the following script one by one which services executed in separate process.
+- Execute the following script step by step, ensuring that each service runs in its own separate process
 ```
 npm run dev:api
 npm run dev:cron
