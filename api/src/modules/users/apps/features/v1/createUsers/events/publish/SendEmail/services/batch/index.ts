@@ -58,7 +58,15 @@ export class OutboxBatchService implements IOutboxBatchService {
 			const { outboxList, service, producer } = params;
 			const results = await executeBatchArrayAsync({
 				items: outboxList,
-				handler: (outbox) => service.handleAsync({ outbox: outbox, producer: producer }),
+				handler: async (outbox) => {
+          console.log(`Sending email to ${outbox.eventType}`);
+          // return service.handleAsync({
+          //   outbox,
+          //   producer,
+          // });
+
+          return ResultFactory.success(VOID_RESULT);
+        },
 				batchSize: 3,
 				concurrency: 3, // Optional throttle
 				runMode: 'parallel',

@@ -53,9 +53,11 @@ export class GetOutboxListService implements IOutboxListService {
 			});
 
 			if (result.isErr()) {
+        await queryRunner.rollbackTransaction();
 				return ResultFactory.error(StatusCodes.NOT_FOUND, result.error.message);
 			}
 
+      await queryRunner.commitTransaction();
 			return ResultFactory.success(result.value);
 		} catch (ex) {
 			const error = ex as Error;

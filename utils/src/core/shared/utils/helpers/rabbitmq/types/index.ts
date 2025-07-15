@@ -1,3 +1,5 @@
+import { StatusCodes } from "http-status-codes";
+
 export interface PubSubMessageRabbitMq<T> {
 	data: T;
 	correlationId?: string;
@@ -22,6 +24,7 @@ export interface ReplyMessageRabbitMq<T> {
 	error?: string;
 	traceId?: string;
 	timestamp?: string; // ISO 8601 format
+  statusCode?:StatusCodes;
 }
 
 export type WorkerRabbitMq = () => Promise<void>;

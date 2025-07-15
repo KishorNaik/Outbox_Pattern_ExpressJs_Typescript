@@ -1,4 +1,5 @@
 import { UUID } from 'crypto';
+import { StatusCodes } from 'http-status-codes';
 
 export interface SendReceiverMessageBullMq<T> {
 	data: T;
@@ -22,6 +23,7 @@ export interface ReplyMessageBullMq<T> {
 	error?: string;
 	traceId?: string;
 	timestamp?: string;
+  statusCode?:StatusCodes;
 }
 
 export interface TriggerJobMessageBullMq<T> {

@@ -1,4 +1,4 @@
-import { bullMqRedisConnection, Container, JsonString, ReplyMessageBullMq, RequestReplyConsumerBullMq, WorkerBullMq } from '@kishornaik/utils';
+import { bullMqRedisConnection, Container, JsonString, ReplyMessageBullMq, RequestReplyConsumerBullMq, StatusCodes, WorkerBullMq } from '@kishornaik/utils';
 import { MapWelcomeUserEmailService } from './services/mapContract';
 import { EmailSentService } from './services/emailSent';
 
@@ -16,6 +16,7 @@ export const welcomeUserEmailSubscribeIntegrationEvent: WorkerBullMq = async () 
         message:null,
         data: null,
         correlationId: reply.data.correlationId,
+        statusCode:StatusCodes.BAD_REQUEST
       }
     }
 
@@ -29,6 +30,7 @@ export const welcomeUserEmailSubscribeIntegrationEvent: WorkerBullMq = async () 
         message:null,
         data: null,
         correlationId: reply.data.correlationId,
+        statusCode:mapResult.error.statusCode
       }
     }
 
@@ -44,6 +46,7 @@ export const welcomeUserEmailSubscribeIntegrationEvent: WorkerBullMq = async () 
         message:null,
         data: null,
         correlationId: reply.data.correlationId,
+        statusCode:emailSendResult.error.statusCode
       }
     }
 

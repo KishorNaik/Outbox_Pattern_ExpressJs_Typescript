@@ -68,14 +68,15 @@ export class PublishWelcomeUserEmailEventService implements IPublishWelcomeUserE
 				JsonString
 			>(`JOB-send-email-queue`, message);
 
-			if (messageResult.success) {
-				// OutBox Update
-				outbox.isPublished = BoolEnum.YES;
-				await this._updateOutboxDbService.handleAsync(outbox);
-				logger.info(`SendEmailEventService: ${messageResult.correlationId} is send`);
-			} else {
-				logger.error(`SendEmailEventService: ${messageResult.error}`);
-			}
+      if(!messageResult.success){
+        logger.error(`SendEmailEventService: StatusCode: ${messageResult.statusCode} || Message: ${messageResult.error}`);
+        return ResultFactory.success(VOID_RESULT);
+      }
+
+      // OutBox Update
+      outbox.isPublished = BoolEnum.YES;
+      await this._updateOutboxDbService.handleAsync(outbox);
+      logger.info(`SendEmailEventService: ${messageResult.correlationId} is send`);
 
 			return ResultFactory.success(VOID_RESULT);
 		});
