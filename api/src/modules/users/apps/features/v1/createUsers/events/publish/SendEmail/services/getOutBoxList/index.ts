@@ -1,4 +1,4 @@
-import { GetOutboxDbDto, GetOutboxDbService, getQueryRunner, OutboxEntity } from '@kishornaik/db';
+import { GetOutboxDbDto, GetOutboxDbService, getQueryRunner, OutboxEntity,QueryRunner } from '@kishornaik/db';
 import {
 	Container,
 	IServiceHandlerAsync,
@@ -15,6 +15,7 @@ Container.set<GetOutboxDbService>(GetOutboxDbService, new GetOutboxDbService());
 
 export interface IOutboxListServiceParameters {
 	eventType: string;
+  queryRunner: QueryRunner;
 }
 
 export interface IOutboxListService
@@ -32,14 +33,18 @@ export class GetOutboxListService implements IOutboxListService {
 	public async handleAsync(
 		params: IOutboxListServiceParameters
 	): Promise<Result<OutboxEntity[], ResultError>> {
-		const queryRunner = getQueryRunner();
-		await queryRunner.connect();
+
 		try {
-			if (!params) return ResultFactory.error(StatusCodes.BAD_REQUEST, 'Value is required');
+			if (!params)
+        return ResultFactory.error(StatusCodes.BAD_REQUEST, 'Value is required');
 
-			const { eventType } = params;
+      if(!params.eventType)
+        return ResultFactory.error(StatusCodes.BAD_REQUEST, 'eventType is required');
 
-			await queryRunner.startTransaction();
+      if(!params.queryRunner)
+        return ResultFactory.error(StatusCodes.BAD_REQUEST, 'queryRunner is required');
+
+      const { eventType,queryRunner } = params;
 
 			// Map Dto
 			const getOutboxDto = new GetOutboxDbDto();
@@ -53,11 +58,9 @@ export class GetOutboxListService implements IOutboxListService {
 			});
 
 			if (result.isErr()) {
-        await queryRunner.rollbackTransaction();
 				return ResultFactory.error(StatusCodes.NOT_FOUND, result.error.message);
 			}
 
-      await queryRunner.commitTransaction();
 			return ResultFactory.success(result.value);
 		} catch (ex) {
 			const error = ex as Error;
@@ -66,8 +69,6 @@ export class GetOutboxListService implements IOutboxListService {
 				error.message,
 				error.stack
 			);
-		} finally {
-			await queryRunner.release();
 		}
 	}
 }

@@ -7,11 +7,13 @@ export const sendWelcomeUserEmailEventCronJob: WorkerCronJob = async () => {
 		`*/20 * * * * *`,
 		async () => {
 			logger.info(`SendEmailEventCronJob started....`);
-			await Container.get(WelcomeUserEmailPublishIntegrationEventService).handleAsync();
+			const result =await Container.get(WelcomeUserEmailPublishIntegrationEventService).handleAsync();
+      if(result.isErr()){
+        logger.error(`CRON Error: ${result.error.message}`);
+      }
 			logger.info(`SendEmailEventCronJob ended....`);
 		},
 		null,
-		false
+		true
 	);
-	job.start();
 };

@@ -1,6 +1,4 @@
 import {
-	Enumerable,
-	err,
 	executeBatchArrayAsync,
 	IServiceHandlerVoidAsync,
 	RequestReplyProducerBullMq,
@@ -10,18 +8,21 @@ import {
 	sealed,
 	Service,
 	tryCatchResultAsync,
-	tryCatchSagaAsync,
 	VOID_RESULT,
 	VoidResult,
 } from '@kishornaik/utils';
 import { PublishWelcomeUserEmailEventService } from '../sendEmailEvent';
-import { OutboxEntity } from '@kishornaik/db';
+import { OutboxEntity, UpdateOutboxDbService,QueryRunner } from '@kishornaik/db';
 import { logger } from '@/shared/utils/helpers/loggers';
 
 export interface IOutboxBatchParameters {
 	outboxList: OutboxEntity[];
-	service: PublishWelcomeUserEmailEventService;
+	services: {
+    publishEventService: PublishWelcomeUserEmailEventService;
+    updateOutboxDbService: UpdateOutboxDbService;
+  }
 	producer: RequestReplyProducerBullMq;
+  queryRunner: QueryRunner;
 }
 
 export interface IOutboxBatchService extends IServiceHandlerVoidAsync<IOutboxBatchParameters> {}
@@ -31,41 +32,29 @@ export interface IOutboxBatchService extends IServiceHandlerVoidAsync<IOutboxBat
 export class OutboxBatchService implements IOutboxBatchService {
 	public handleAsync(params: IOutboxBatchParameters): Promise<Result<VoidResult, ResultError>> {
 		return tryCatchResultAsync(async () => {
-			/*
-      const taskPromises:Promise<Result<VoidResult, ResultError>[]>[]=[];
-      let batchSize:number=3;
 
-      const {outboxList,service, producer}=params;
+			const { outboxList, services, producer,queryRunner } = params;
+      const { publishEventService, updateOutboxDbService } = services;
 
-      const numberOfBatches:number=Math.ceil(outboxList.length / batchSize);
-
-      for (let i = 0; i < numberOfBatches; i++) {
-        const tempBoxList=Enumerable.from(outboxList).skip(i*batchSize).take(batchSize).toArray();
-        const tasks=tempBoxList.map(x => service.handleAsync({
-            outbox:x,
-            producer:producer
-          })
-        );
-
-        taskPromises.push(Promise.all(tasks));
-
-      }
-
-      (await Promise.all(taskPromises)).flat();
-
-      return ResultFactory.success(VOID_RESULT);
-      */
-			const { outboxList, service, producer } = params;
 			const results = await executeBatchArrayAsync({
 				items: outboxList,
 				handler: async (outbox) => {
-          console.log(`Sending email to ${outbox.eventType}`);
-          // return service.handleAsync({
-          //   outbox,
-          //   producer,
-          // });
 
-          return ResultFactory.success(VOID_RESULT);
+          var result = await publishEventService.handleAsync({
+            producer:producer,
+            outbox:outbox,
+            updateOutboxDbService:updateOutboxDbService,
+            queryRunner: queryRunner
+          });
+          if(result.isErr()){
+            logger.error(`Batch:Failed to send email to ${outbox.identifier}, error: ${result.error.message}`);
+          }
+          else
+          {
+            logger.info(`Batch:Email sent to ${outbox.identifier}`);
+          }
+          return result;
+          //return ResultFactory.success(VOID_RESULT);
         },
 				batchSize: 3,
 				concurrency: 3, // Optional throttle

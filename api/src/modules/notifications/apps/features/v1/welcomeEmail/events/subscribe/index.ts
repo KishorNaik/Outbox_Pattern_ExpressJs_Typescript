@@ -64,11 +64,11 @@ export const welcomeUserEmailSubscribeIntegrationEvent: WorkerBullMq = async () 
   });
 
   worker.on('completed', (job) => {
-		console.log(`[App - PubSubConsumer] Job completed: ${job.id}`);
+		console.log(`[App - Notification] Job completed: ${job.id}`);
 	});
 
 	worker.on('failed', (job, err) => {
-		console.error(`[App - PubSubConsumer] Job failed: ${job.id}, Error: ${err.message}`);
+		console.error(`[App - Notification] Job failed: ${job.id}, Error: ${err.message}`);
 	});
 
 };
