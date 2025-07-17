@@ -1,4 +1,4 @@
-import { UserEntity, QueryRunner, AddOutboxDbService, OutboxEntity } from '@kishornaik/db';
+import { UserEntity, QueryRunner, AddOutboxDbService, OutboxEntity, JobStatusEnum } from '@kishornaik/db';
 import {
 	IServiceHandlerVoidAsync,
 	Result,
@@ -63,6 +63,8 @@ export class CreateOutboxDbService implements ICreateOutboxDbService {
 			outbox.payload = payload;
 			outbox.created_date = new Date();
 			outbox.modified_date = new Date();
+      outbox.jobStatus=JobStatusEnum.PENDING;
+      outbox.lockedBy=`CRON_JOB_INSTANCE_1`; // Take from .env file
 
 			// Add
 			const result = await this._addOutboxDbService.handleAsync(outbox, queryRunner);

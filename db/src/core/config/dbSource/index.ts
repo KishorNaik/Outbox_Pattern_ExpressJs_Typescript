@@ -15,9 +15,9 @@ export const dbDataSource = new DataSource({
 	entities: [...userModuleDbDataSourceRegisterEntity, ...outboxModuleDbDataSourceRegisterEntity],
 	subscribers: [],
 	migrations: ['src/migration/**/*.ts'],
-  extra:{
-    max: 10
-  }
+	extra: {
+		max: 10,
+	},
 });
 
 async function initializeDatabase() {

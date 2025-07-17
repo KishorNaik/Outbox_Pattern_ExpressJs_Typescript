@@ -54,6 +54,7 @@ export class GetOutboxListService implements IOutboxListService {
 			const getOutboxDto = new GetOutboxDbDto();
 			getOutboxDto.eventType = eventType;
 			getOutboxDto.take = 12;
+      getOutboxDto.instanceId=`CRON_JOB_INSTANCE_1`; // Take from .env file
 
 			// Db Service
 			const result = await this._getOutboxDbService.handleAsync({

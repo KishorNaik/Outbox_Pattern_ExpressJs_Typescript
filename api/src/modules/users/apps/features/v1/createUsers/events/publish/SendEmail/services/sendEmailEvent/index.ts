@@ -1,5 +1,5 @@
 import { logger } from '@/shared/utils/helpers/loggers';
-import { OutboxEntity, UpdateOutboxDbService, QueryRunner } from '@kishornaik/db';
+import { OutboxEntity, UpdateOutboxDbService, QueryRunner, JobStatusEnum } from '@kishornaik/db';
 import {
 	BoolEnum,
 	Container,
@@ -78,6 +78,7 @@ export class PublishWelcomeUserEmailEventService implements IPublishWelcomeUserE
 
 			// OutBox Update
 			outbox.isPublished = BoolEnum.YES;
+      outbox.jobStatus=JobStatusEnum.COMPLETED;
 			const updateDbResult = await updateOutboxDbService.handleAsync(outbox, queryRunner);
 			if (updateDbResult.isErr()) {
 				return ResultFactory.error(messageResult.statusCode, messageResult.message);

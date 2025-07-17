@@ -18,7 +18,7 @@ import {
 	tryCatchResultAsync,
 } from '@kishornaik/utils';
 import { IsNotEmpty, IsNumber, IsString, Max, Min } from 'class-validator';
-import { OutboxEntity } from '../../../../outbox.Module';
+import { JobStatusEnum, OutboxEntity } from '../../../../outbox.Module';
 import { dbDataSource } from '../../../../../../config/dbSource';
 
 export class GetOutboxDbDto {
@@ -32,6 +32,11 @@ export class GetOutboxDbDto {
 	@Min(1)
 	@Max(12)
 	public take?: number = 12;
+
+	@IsNotEmpty()
+	@IsString()
+	@IsSafeString()
+	public instanceId?: string;
 }
 
 export interface IGetOutboxDbServiceParameters {
@@ -74,25 +79,40 @@ export class GetOutboxDbService implements IGetOutboxDbService {
 				return ResultFactory.error(StatusCodes.BAD_REQUEST, validationResult.error.message);
 
 			const { queryRunner, request } = params;
-			const { eventType, take } = request;
+			const { eventType, take, instanceId } = request;
 
 			// Run Query Runner or Entity Manager
 			const entityManger = queryRunner ? queryRunner.manager : dbDataSource.manager;
 
 			// Query
-			let results = await entityManger
+			const claimableRows = await entityManger
 				.createQueryBuilder(OutboxEntity, 'outbox')
 				.where('outbox.eventType = :eventType', { eventType })
+				.andWhere('outbox.jobStatus = :jobStatus', { jobStatus: JobStatusEnum.PENDING })
 				.andWhere('outbox.isPublished = :isPublished', { isPublished: BoolEnum.NO })
 				.andWhere('outbox.status = :status', { status: StatusEnum.ACTIVE })
+				.andWhere('outbox.lockedBy IS NULL')
 				.orderBy('outbox.created_date', 'ASC')
-				.take(take ?? 12)
+				.limit(take ?? 12)
 				.getMany();
 
-			if (!results || results.length === 0)
+			if (!claimableRows || claimableRows.length === 0)
 				return ResultFactory.error(StatusCodes.NOT_FOUND, 'No outbox found');
 
-			return ResultFactory.success(results);
+			// Update
+			const ids = claimableRows.map((row) => row.id);
+			await entityManger
+				.createQueryBuilder()
+				.update(OutboxEntity)
+				.set({
+					jobStatus: JobStatusEnum.PROCESSING,
+					lockedBy: instanceId,
+					lockedAt: new Date(),
+				})
+				.whereInIds(ids)
+				.execute();
+
+			return ResultFactory.success(claimableRows);
 		});
 	}
 }

@@ -7,7 +7,7 @@ import {
 	initializeDatabase,
 } from '../../../../../../config/dbSource';
 import { randomUUID } from 'crypto';
-import { AddOutboxDbService, OutboxEntity } from '../../../../outbox.Module';
+import { AddOutboxDbService, JobStatusEnum, OutboxEntity } from '../../../../outbox.Module';
 
 // Debug Mode:All Test Case Run
 //node --trace-deprecation --test --require ts-node/register -r tsconfig-paths/register ./src/core/modules/outbox/tests/features/v1/addOutbox/index.test.ts
@@ -105,6 +105,8 @@ describe(`Add-Outbox-Unit-Tests`, () => {
 			email: 'john.doe@example.com',
 		});
 		entity.isPublished = BoolEnum.NO;
+		entity.lockedBy = `CRON_JOB_INSTANCE_1`;
+		entity.jobStatus = JobStatusEnum.PENDING;
 
 		await queryRunner.startTransaction();
 

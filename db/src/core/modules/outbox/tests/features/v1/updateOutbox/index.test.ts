@@ -7,7 +7,7 @@ import {
 	initializeDatabase,
 } from '../../../../../../config/dbSource';
 import { randomUUID } from 'crypto';
-import { AddOutboxDbService, OutboxEntity } from '../../../../outbox.Module';
+import { AddOutboxDbService, JobStatusEnum, OutboxEntity } from '../../../../outbox.Module';
 import { UpdateOutboxDbService } from '../../../../apps/features/v1/updateOutbox';
 
 // Debug Mode:All Test Case Run
@@ -77,6 +77,7 @@ describe(`Add-Outbox-Unit-Tests`, () => {
 		entity.identifier = `2c530f28-d9ea-422b-96e1-1459d45d6adf`;
 		entity.status = StatusEnum.ACTIVE;
 		entity.isPublished = BoolEnum.YES;
+		entity.jobStatus = JobStatusEnum.COMPLETED;
 
 		await queryRunner.startTransaction();
 

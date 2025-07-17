@@ -7,4 +7,4 @@ export const outboxModuleDbDataSourceRegisterEntity: Function[] = [OutboxEntity]
 export * from './infrastructure/entity/index';
 export * from './apps/features/v1/addOutbox/index';
 export * from './apps/features/v1/getOutBox/index';
-export * from "./apps/features/v1/updateOutbox/index";
+export * from './apps/features/v1/updateOutbox/index';

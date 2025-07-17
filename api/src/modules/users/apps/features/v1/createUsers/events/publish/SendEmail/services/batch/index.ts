@@ -38,6 +38,8 @@ export class OutboxBatchService implements IOutboxBatchService {
 			const results = await executeBatchArrayAsync({
 				items: outboxList,
 				handler: async (outbox) => {
+
+          // Publish Event
 					var result = await publishEventService.handleAsync({
 						producer: producer,
 						outbox: outbox,

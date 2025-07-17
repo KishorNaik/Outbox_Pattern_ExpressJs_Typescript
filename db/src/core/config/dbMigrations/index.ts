@@ -22,9 +22,9 @@ const connectionOptions: DataSourceOptions = {
 	subscribers: [],
 	migrations: ['src/core/config/dbMigrations/migrations/**/*.ts'],
 	migrationsTableName: 'custom_migration_table',
-  extra: {
-    max: 10,
-  },
+	extra: {
+		max: 10,
+	},
 };
 
 export default new DataSource({
